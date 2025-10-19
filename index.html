@@ -161,6 +161,32 @@
             flex: 1;
         }
 
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 1rem;
+            padding: 12px;
+            background: var(--bg-card-light);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .checkbox-group:hover {
+            background: var(--border);
+        }
+
+        .checkbox-group input {
+            width: auto;
+            padding: 0;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
         .total-income {
             text-align: center;
             margin: 1.5rem 0;
@@ -313,7 +339,7 @@
                 <label for="expenseAmount">Expense Amount</label>
                 <div class="input-with-icon">
                     <i class="fas fa-euro-sign"></i>
-                    <input type="number" id="expenseAmount" placeholder="Enter amount" min="0" step="0.01" value="100">
+                    <input type="number" id="expenseAmount" placeholder="Enter amount" min="0" step="0.01" value="0">
                 </div>
             </div>
             
@@ -323,29 +349,34 @@
                     <div class="salary-input">
                         <div class="input-with-icon">
                             <i class="fas fa-user icon-you"></i>
-                            <input type="number" id="person1Salary" min="0" step="1" value="1500" placeholder="Your salary">
+                            <input type="number" id="person1Salary" min="0" step="1" value="0" placeholder="Your salary">
                         </div>
                     </div>
                     <div class="salary-input">
                         <div class="input-with-icon">
                             <i class="fas fa-user-friends icon-partner"></i>
-                            <input type="number" id="person2Salary" min="0" step="1" value="1100" placeholder="Partner's salary">
+                            <input type="number" id="person2Salary" min="0" step="1" value="0" placeholder="Partner's salary">
                         </div>
                     </div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember my salaries for next time</label>
                 </div>
             </div>
             
             <div class="total-income" id="totalIncome">
-                Total Household Income: €2,600
+                Total Household Income: €0
             </div>
             
             <div class="percentage-display">
                 <div class="percentage-item">
-                    <div class="percentage-value" id="person1PercentDisplay">57.69%</div>
+                    <div class="percentage-value" id="person1PercentDisplay">0%</div>
                     <div class="percentage-label">Your Share</div>
                 </div>
                 <div class="percentage-item">
-                    <div class="percentage-value" id="person2PercentDisplay">42.31%</div>
+                    <div class="percentage-value" id="person2PercentDisplay">0%</div>
                     <div class="percentage-label">Partner's Share</div>
                 </div>
             </div>
@@ -362,7 +393,7 @@
                     <i class="fas fa-user icon-you"></i>
                     <span>Your share:</span>
                 </div>
-                <div class="result-value" id="person1Share">€57.69</div>
+                <div class="result-value" id="person1Share">€0.00</div>
             </div>
             
             <div class="result-item">
@@ -370,7 +401,7 @@
                     <i class="fas fa-user-friends icon-partner"></i>
                     <span>Partner's share:</span>
                 </div>
-                <div class="result-value" id="person2Share">€42.31</div>
+                <div class="result-value" id="person2Share">€0.00</div>
             </div>
             
             <div class="result-item">
@@ -378,7 +409,7 @@
                     <i class="fas fa-arrow-right icon-transfer"></i>
                     <span>If you pay:</span>
                 </div>
-                <div class="result-value" id="ifYouPay">€42.31</div>
+                <div class="result-value" id="ifYouPay">€0.00</div>
             </div>
             
             <div class="result-item">
@@ -386,7 +417,7 @@
                     <i class="fas fa-arrow-left icon-transfer"></i>
                     <span>If partner pays:</span>
                 </div>
-                <div class="result-value" id="ifPartnerPays">€57.69</div>
+                <div class="result-value" id="ifPartnerPays">€0.00</div>
             </div>
         </div>
         
@@ -401,6 +432,7 @@
                 <li>If you pay, your partner should reimburse you for their share</li>
                 <li>If your partner pays, you should reimburse them for your share</li>
                 <li>This ensures both contribute the same percentage of income</li>
+                <li>Check "Remember my salaries" to save them for future visits</li>
             </ul>
         </div>
     </div>
@@ -410,6 +442,7 @@
             const expenseAmountInput = document.getElementById('expenseAmount');
             const person1SalaryInput = document.getElementById('person1Salary');
             const person2SalaryInput = document.getElementById('person2Salary');
+            const rememberMeCheckbox = document.getElementById('rememberMe');
             const totalIncomeElement = document.getElementById('totalIncome');
             const person1PercentDisplay = document.getElementById('person1PercentDisplay');
             const person2PercentDisplay = document.getElementById('person2PercentDisplay');
@@ -417,6 +450,29 @@
             const person2ShareElement = document.getElementById('person2Share');
             const ifYouPayElement = document.getElementById('ifYouPay');
             const ifPartnerPaysElement = document.getElementById('ifPartnerPays');
+            
+            function loadSavedData() {
+                const savedData = localStorage.getItem('fairShareData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    person1SalaryInput.value = data.person1Salary || 0;
+                    person2SalaryInput.value = data.person2Salary || 0;
+                    rememberMeCheckbox.checked = true;
+                    calculatePercentages();
+                }
+            }
+            
+            function saveData() {
+                if (rememberMeCheckbox.checked) {
+                    const data = {
+                        person1Salary: person1SalaryInput.value,
+                        person2Salary: person2SalaryInput.value
+                    };
+                    localStorage.setItem('fairShareData', JSON.stringify(data));
+                } else {
+                    localStorage.removeItem('fairShareData');
+                }
+            }
             
             function formatCurrency(amount) {
                 return new Intl.NumberFormat('en-EU', {
@@ -444,6 +500,7 @@
                 }
                 
                 calculateShares();
+                saveData();
             }
             
             function calculateShares() {
@@ -475,6 +532,9 @@
             expenseAmountInput.addEventListener('input', calculateShares);
             person1SalaryInput.addEventListener('input', calculatePercentages);
             person2SalaryInput.addEventListener('input', calculatePercentages);
+            rememberMeCheckbox.addEventListener('change', saveData);
+            
+            loadSavedData();
             
             calculatePercentages();
         });
