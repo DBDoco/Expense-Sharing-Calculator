@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FairShare | Expense Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root {
+            --primary: #8a6df1;
+            --primary-light: #9d85f3;
+            --primary-dark: #7856e0;
+            --secondary: #ff7ee5;
+            --accent: #6df1d1;
+            --text: #f0f0f0;
+            --text-light: #b0b0b0;
+            --bg: #121212;
+            --bg-card: #1e1e1e;
+            --bg-card-light: #2a2a2a;
+            --border: #333333;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --error: #f87171;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(138, 109, 241, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 126, 229, 0.1) 0%, transparent 20%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            background: var(--primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(138, 109, 241, 0.3);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.7rem;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px 14px 46px;
+            background: var(--bg-card-light);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(138, 109, 241, 0.2);
+        }
+
+        .salary-inputs {
+            display: flex;
+            gap: 15px;
+        }
+
+        .salary-input {
+            flex: 1;
+        }
+
+        .total-income {
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: var(--bg-card-light);
+            border-radius: 12px;
+            font-weight: 600;
+            color: var(--text);
+            border: 1px dashed var(--border);
+        }
+
+        .percentage-display {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-card-light);
+            border-radius: 12px;
+        }
+
+        .percentage-item {
+            text-align: center;
+        }
+
+        .percentage-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .percentage-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .results {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .result-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .instructions {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+        }
+
+        .instructions ul {
+            padding-left: 1.2rem;
+        }
+
+        .instructions li {
+            margin-bottom: 0.8rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .icon-you {
+            color: var(--primary);
+        }
+
+        .icon-partner {
+            color: var(--secondary);
+        }
+
+        .icon-share {
+            color: var(--accent);
+        }
+
+        .icon-transfer {
+            color: var(--warning);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .salary-inputs {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .card, .results, .instructions {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+            </div>
+            <h1>FairShare</h1>
+            <p class="subtitle">Calculate fair expense sharing based on income</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-receipt"></i>
+                <span>Expense Details</span>
+            </div>
+            
+            <div class="input-group">
+                <label for="expenseAmount">Expense Amount</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-euro-sign"></i>
+                    <input type="number" id="expenseAmount" placeholder="Enter amount" min="0" step="0.01" value="100">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>Monthly Salaries</label>
+                <div class="salary-inputs">
+                    <div class="salary-input">
+                        <div class="input-with-icon">
+                            <i class="fas fa-user icon-you"></i>
+                            <input type="number" id="person1Salary" min="0" step="1" value="1500" placeholder="Your salary">
+                        </div>
+                    </div>
+                    <div class="salary-input">
+                        <div class="input-with-icon">
+                            <i class="fas fa-user-friends icon-partner"></i>
+                            <input type="number" id="person2Salary" min="0" step="1" value="1100" placeholder="Partner's salary">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="total-income" id="totalIncome">
+                Total Household Income: €2,600
+            </div>
+            
+            <div class="percentage-display">
+                <div class="percentage-item">
+                    <div class="percentage-value" id="person1PercentDisplay">57.69%</div>
+                    <div class="percentage-label">Your Share</div>
+                </div>
+                <div class="percentage-item">
+                    <div class="percentage-value" id="person2PercentDisplay">42.31%</div>
+                    <div class="percentage-label">Partner's Share</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="results">
+            <div class="card-title">
+                <i class="fas fa-chart-pie"></i>
+                <span>Payment Details</span>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">
+                    <i class="fas fa-user icon-you"></i>
+                    <span>Your share:</span>
+                </div>
+                <div class="result-value" id="person1Share">€57.69</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">
+                    <i class="fas fa-user-friends icon-partner"></i>
+                    <span>Partner's share:</span>
+                </div>
+                <div class="result-value" id="person2Share">€42.31</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">
+                    <i class="fas fa-arrow-right icon-transfer"></i>
+                    <span>If you pay:</span>
+                </div>
+                <div class="result-value" id="ifYouPay">€42.31</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">
+                    <i class="fas fa-arrow-left icon-transfer"></i>
+                    <span>If partner pays:</span>
+                </div>
+                <div class="result-value" id="ifPartnerPays">€57.69</div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <div class="card-title">
+                <i class="fas fa-info-circle"></i>
+                <span>How It Works</span>
+            </div>
+            <ul>
+                <li>Enter the expense amount and your monthly salaries</li>
+                <li>FairShare calculates proportional shares based on income</li>
+                <li>If you pay, your partner should reimburse you for their share</li>
+                <li>If your partner pays, you should reimburse them for your share</li>
+                <li>This ensures both contribute the same percentage of income</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            Made with <i class="fas fa-heart" style="color: var(--error);"></i> for fair sharing
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const expenseAmountInput = document.getElementById('expenseAmount');
+            const person1SalaryInput = document.getElementById('person1Salary');
+            const person2SalaryInput = document.getElementById('person2Salary');
+            const totalIncomeElement = document.getElementById('totalIncome');
+            const person1PercentDisplay = document.getElementById('person1PercentDisplay');
+            const person2PercentDisplay = document.getElementById('person2PercentDisplay');
+            const person1ShareElement = document.getElementById('person1Share');
+            const person2ShareElement = document.getElementById('person2Share');
+            const ifYouPayElement = document.getElementById('ifYouPay');
+            const ifPartnerPaysElement = document.getElementById('ifPartnerPays');
+            
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('en-EU', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(amount);
+            }
+            
+            function calculatePercentages() {
+                const person1Salary = parseFloat(person1SalaryInput.value) || 0;
+                const person2Salary = parseFloat(person2SalaryInput.value) || 0;
+                const totalSalary = person1Salary + person2Salary;
+                
+                totalIncomeElement.textContent = `Total Household Income: €${formatCurrency(totalSalary)}`;
+                
+                if (totalSalary > 0) {
+                    const person1Percent = (person1Salary / totalSalary * 100).toFixed(2);
+                    const person2Percent = (person2Salary / totalSalary * 100).toFixed(2);
+                    
+                    person1PercentDisplay.textContent = person1Percent + '%';
+                    person2PercentDisplay.textContent = person2Percent + '%';
+                } else {
+                    person1PercentDisplay.textContent = '0%';
+                    person2PercentDisplay.textContent = '0%';
+                }
+                
+                calculateShares();
+            }
+            
+            function calculateShares() {
+                const expenseAmount = parseFloat(expenseAmountInput.value) || 0;
+                const person1Salary = parseFloat(person1SalaryInput.value) || 0;
+                const person2Salary = parseFloat(person2SalaryInput.value) || 0;
+                const totalSalary = person1Salary + person2Salary;
+                
+                if (totalSalary > 0) {
+                    const person1Percent = person1Salary / totalSalary;
+                    const person2Percent = person2Salary / totalSalary;
+                    
+                    const person1Share = expenseAmount * person1Percent;
+                    const person2Share = expenseAmount * person2Percent;
+                    
+                    person1ShareElement.textContent = '€' + formatCurrency(person1Share);
+                    person2ShareElement.textContent = '€' + formatCurrency(person2Share);
+                    
+                    ifYouPayElement.textContent = '€' + formatCurrency(person2Share);
+                    ifPartnerPaysElement.textContent = '€' + formatCurrency(person1Share);
+                } else {
+                    person1ShareElement.textContent = '€0.00';
+                    person2ShareElement.textContent = '€0.00';
+                    ifYouPayElement.textContent = '€0.00';
+                    ifPartnerPaysElement.textContent = '€0.00';
+                }
+            }
+            
+            expenseAmountInput.addEventListener('input', calculateShares);
+            person1SalaryInput.addEventListener('input', calculatePercentages);
+            person2SalaryInput.addEventListener('input', calculatePercentages);
+            
+            calculatePercentages();
+        });
+    </script>
+</body>
+</html>
